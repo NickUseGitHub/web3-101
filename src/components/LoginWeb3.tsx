@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Web3 from "web3";
+import { CONTRACT_ADDRESS, CONTRACT_ABI } from "../constants";
 
 declare global {
   interface Window {
@@ -29,6 +30,27 @@ export default function LoginWeb3() {
   };
   const onBtnLogoutClick = () => setAccounts([]);
 
+  const onBtnGetContractDetail = async () => {
+    const [account] = accounts;
+
+    if (!account) {
+      alert("Please Login");
+
+      return;
+    }
+
+    const contract = new w3Instance.current.eth.Contract(
+      CONTRACT_ABI,
+      CONTRACT_ADDRESS
+    );
+
+    const result = await contract.methods.contractBalance().call({
+      from: account,
+    });
+
+    console.log("result", result);
+  };
+
   const isShowLoginButton = accounts && accounts.length === 0;
   const isShowLogoutButton = isShowLoginButton !== true;
 
@@ -52,6 +74,11 @@ export default function LoginWeb3() {
       {isShowLoginButton && (
         <div>
           <button onClick={onBtnLoginClick}>Login w3</button>
+        </div>
+      )}
+      {isShowLogoutButton && (
+        <div>
+          <button onClick={onBtnGetContractDetail}>Get Contract Detail</button>
         </div>
       )}
       {isShowLogoutButton && (
